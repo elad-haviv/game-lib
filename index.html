@@ -4,100 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#8e44ad">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon.png">
 <title>ספריית משחקים</title>
-<link rel="manifest" href="manifest.json">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@800;900&display=swap');
-:root{--bg:#f8f0ff;--card:#fff;--accent:#8e44ad;--accent2:#e67e22;--win:#27ae60;--text:#2d2d3a;--shadow:rgba(142,68,173,0.12)}
-*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;font-family:'Heebo',sans-serif;background:linear-gradient(135deg,#f5eeff 0%,#fff8e7 100%);color:var(--text);overflow:hidden}
-#app{max-width:480px;margin:0 auto;height:100vh;display:flex;flex-direction:column;padding:16px 16px 28px}
-header{text-align:center;padding:10px 0 14px}
-header h1{font-family:'Heebo',sans-serif;font-size:2.1rem;color:var(--accent);letter-spacing:1px;text-shadow:0 3px 0 rgba(142,68,173,0.15)}
-.screen{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px;animation:fadeIn .3s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.library-header{text-align:center;font-size:1.05rem;color:#777;margin-bottom:4px}
-.game-card{display:flex;align-items:center;gap:16px;background:var(--card);border-radius:22px;padding:18px 16px;box-shadow:0 8px 20px var(--shadow);text-decoration:none;color:inherit;transition:transform .1s;cursor:pointer;border:none;font-family:inherit;font-size:1.1rem}
-.game-card:active{transform:scale(.98)}
-.game-card .emoji{font-size:2.4rem;background:linear-gradient(135deg,#8e44ad,#9b59b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.game-card .info h2{font-size:1.15rem;color:var(--accent);margin-bottom:2px}
-.game-card .info p{font-size:.85rem;color:#888}
-.status{font-family:'Heebo',sans-serif;text-align:center;font-size:1.1rem;padding:6px 14px;border-radius:50px;background:var(--card);box-shadow:0 4px 12px var(--shadow);margin-bottom:10px;min-height:44px;line-height:1.35;display:flex;align-items:center;justify-content:center;gap:8px}
-.status .dot{width:10px;height:10px;border-radius:50%;display:inline-block;animation:pulse 1s infinite alternate}
-.status .dot.x{background:var(--accent)}
-.status .dot.o{background:var(--accent2)}
-@keyframes pulse{from{opacity:.5}to{opacity:1}}
-.mode-card{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-.mode-card button{border:none;border-radius:20px;padding:18px 6px;font-family:'Heebo',sans-serif;font-size:1.05rem;color:#fff;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,0.1);transition:transform .08s,box-shadow .08s}
-.mode-card button:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,0.1)}
-.mode-card .vs-comp{background:linear-gradient(135deg,#8e44ad,#9b59b6)}
-.mode-card .two-player{background:linear-gradient(135deg,#e67e22,#f39c12)}
-.board{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;flex:1;min-height:0}
-.board button{aspect-ratio:1;border:none;border-radius:20px;background:linear-gradient(145deg,#fff,#f6f6fa);box-shadow:0 6px 0 #ececf3,0 10px 20px rgba(0,0,0,.04);font-family:'Heebo',sans-serif;font-size:3.2rem;color:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:all .2s}
-.board button.filled{color:inherit;animation:pop .25s ease-out}
-.board button.filled.x{color:var(--accent);text-shadow:0 3px 0 rgba(142,68,173,.25)}
-.board button.filled.o{color:var(--accent2);text-shadow:0 3px 0 rgba(230,126,34,.25)}
-@keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
-.win-line{position:absolute;background:#27ae60;border-radius:4px;box-shadow:0 0 12px rgba(39,174,96,.6);z-index:2;pointer-events:none}
-.win-line.h{width:100%;height:8px;top:50%;left:0;transform:translateY(-50%)}
-.win-line.v{width:8px;height:100%;left:50%;top:0;transform:translateX(-50%)}
-.win-line.d1{width:140%;height:8px;top:50%;left:50%;transform:translate(-50%,-50%) rotate(45deg)}
-.win-line.d2{width:140%;height:8px;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-45deg)}
-.bottom{display:flex;gap:10px;margin-top:12px}
-.bottom button{flex:1;border:none;border-radius:14px;padding:14px;font-family:'Heebo',sans-serif;font-size:1rem;color:#fff;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.08);transition:transform .08s,box-shadow .08s;background:linear-gradient(135deg,#555,#777)}
-.bottom button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.08)}
-</style>
 </head>
 <body>
-<div id="app"></div>
-<script>
-const $=s=>document.querySelector(s);
-let mode='library', board=['','','','','','','','',''], turn='X', gameOver=false, winner=null, lineEl=null;
-const winLines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-
-function renderLibrary(){
-  mode='library';
-  $('#app').innerHTML=`
-  <header><h1>📚 ספריית משחקים</h1></header>
-  <div class="screen">
-    <div class="library-header">בחרו משחק</div>
-    <button class="game-card" onclick="startTicTacToe()">
-      <div class="emoji">❌⭕</div>
-      <div class="info"><h2>איקס עיגול</h2><p>נגד המחשב או חבר</p></div>
-    </button>
-  </div>`;
-}
-
-function startTicTacToe(){
-  mode='game';
-  $('#app').innerHTML=`
-  <header><h1>❌⭕ איקס עיגול</h1></header>
-  <div class="screen">
-  <div class="mode-card">
-    <button class="vs-comp" onclick="startMode('comp')">🤖 נגד המחשב</button>
-    <button class="two-player" onclick="startMode('2p')">👥 שני שחקנים</button>
-  </div>
-  <div class="status" id="status">בחרו מצב משחק</div>
-  <div class="board" id="board"></div>
-  <div class="bottom">
-    <button onclick="renderLibrary()">🏠 ספרייה</button>
-    <button onclick="resetGame()">🔄 התחלה מחדש</button>
-  </div>
-  </div>`;
-}
-
-function startMode(m){
-  if(mode!=='game'){ startTicTacToe(); }
-  mode=m; board=Array(9).fill(''); turn='X'; gameOver=false; winner=null; $('#status').innerHTML='תור שחקן <span class="dot x"></span> X'; if(lineEl){lineEl.remove(); lineEl=null} buildBoard(); if(m==='comp'&&turn==='O') setTimeout(compMove,500);
-}
-function buildBoard(){ $('#board').innerHTML=''; for(let i=0;i<9;i++){ let b=document.createElement('button'); b.onclick=()=>move(i); $('#board').appendChild(b); } }
-function move(i){ if(board[i]||gameOver||mode==='comp'&&turn==='O') return; board[i]=turn; updateUI(); if(checkWin()){ gameOver=true; $('#status').innerHTML='<span style="color:#27ae60;font-weight:900">' + turn + ' ניצח!</span>'; showLine(); }else if(board.every(c=>c)){ gameOver=true; $('#status').innerHTML='<span style="color:#888">תיקו!</span>'; }else{ turn=turn==='X'?'O':'X'; $('#status').innerHTML='תור שחקן <span class="dot '+(turn==='X'?'x':'o')+'"></span> '+turn; if(mode==='comp'&&turn==='O') setTimeout(compMove,400); } }
-function compMove(){ if(gameOver) return; let empty=board.map((v,i)=>v===''?i:null).filter(i=>i!==null); let r=empty[Math.floor(Math.random()*empty.length)]; if(r!==undefined) move(r); }
-function checkWin(){ for(let [a,b,c] of winLines){ if(board[a]&&board[a]===board[b]&&board[a]===board[c]){ winner=[a,b,c]; return true; } } return false; }
-function showLine(){ if(!winner) return; let [a,b,c]=winner; let dir=''; if(winner[0]%3===0&&winner[2]%3===2) dir='h'; else if(winner[0]<3&&winner[2]>6) dir='v'; else if(winner.join(',')==='0,4,8') dir='d1'; else dir='d2'; lineEl=document.createElement('div'); lineEl.className='win-line '+dir; $('#board').children[a].appendChild(lineEl); }
-function updateUI(){ Array.from($('#board').children).forEach((btn,i)=>{ btn.className=board[i]?'filled '+board[i].toLowerCase():''; btn.textContent=board[i]||''; }); }
-function resetGame(){ startMode(mode); }
-renderLibrary();
-</script>
+<div id="root"></div>
+<script type="module" src="/src/main.tsx"></script>
 </body>
 </html>

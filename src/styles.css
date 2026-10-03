@@ -1,0 +1,38 @@
+:root{--bg:#f8f0ff;--card:#fff;--accent:#8e44ad;--accent2:#e67e22;--win:#27ae60;--text:#2d2d3a;--shadow:rgba(142,68,173,0.12)}
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+html,body,#root{height:100%}
+body{font-family:'Heebo',system-ui,sans-serif;background:linear-gradient(135deg,#f5eeff 0%,#fff8e7 100%);color:var(--text);overflow:hidden}
+#root{max-width:520px;margin:0 auto;height:100%;display:flex;flex-direction:column;padding:16px 16px 24px}
+header{display:flex;align-items:center;gap:10px;padding:6px 0 12px}
+header h1{font-size:1.7rem;color:var(--accent);flex:1}
+.back-btn{border:none;border-radius:14px;padding:10px 16px;background:linear-gradient(135deg,#555,#777);color:#fff;font-family:inherit;font-size:.95rem;box-shadow:0 4px 0 rgba(0,0,0,.08);cursor:pointer}
+.back-btn:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.08)}
+.screen{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.library-header{text-align:center;font-size:1.05rem;color:#777}
+.game-card{display:flex;align-items:center;gap:16px;background:var(--card);border-radius:22px;padding:18px 16px;box-shadow:0 8px 20px var(--shadow);text-decoration:none;color:inherit;cursor:pointer;border:none;font-family:inherit;font-size:1.1rem;text-align:right}
+.game-card:active{transform:scale(.98)}
+.game-card .emoji{font-size:2.4rem}
+.game-card .info h2{font-size:1.15rem;color:var(--accent);margin-bottom:2px}
+.game-card .info p{font-size:.85rem;color:#888}
+.mode-card{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mode-card button{border:none;border-radius:20px;padding:18px 6px;font-family:inherit;font-size:1.05rem;color:#fff;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,0.1);transition:transform .08s,box-shadow .08s}
+.mode-card button:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,0.1)}
+.mode-card .vs-comp{background:linear-gradient(135deg,#8e44ad,#9b59b6)}
+.mode-card .two-player{background:linear-gradient(135deg,#e67e22,#f39c12)}
+.status{text-align:center;font-size:1.1rem;padding:6px 14px;border-radius:50px;background:var(--card);box-shadow:0 4px 12px var(--shadow);min-height:44px;line-height:1.35;display:flex;align-items:center;justify-content:center;gap:8px}
+.status .dot{width:10px;height:10px;border-radius:50%;display:inline-block;animation:pulse 1s infinite alternate}
+.status .dot.x{background:var(--accent)}
+.status .dot.o{background:var(--accent2)}
+@keyframes pulse{from{opacity:.5}to{opacity:1}}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;flex:1;min-height:0}
+.board button{aspect-ratio:1;border:none;border-radius:20px;background:linear-gradient(145deg,#fff,#f6f6fa);box-shadow:0 6px 0 #ececf3,0 10px 20px rgba(0,0,0,.04);font-family:inherit;font-size:3rem;color:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:all .2s}
+.board button.filled{color:inherit;animation:pop .25s ease-out}
+.board button.filled.x{color:var(--accent);text-shadow:0 3px 0 rgba(142,68,173,.25)}
+.board button.filled.o{color:var(--accent2);text-shadow:0 3px 0 rgba(230,126,34,.25)}
+.board button.win-cell{background:linear-gradient(145deg,#eafff3,#d6ffe8);box-shadow:0 6px 0 #bfeed2}
+@keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.bottom{display:flex;gap:10px}
+.bottom button{flex:1;border:none;border-radius:14px;padding:14px;font-family:inherit;font-size:1rem;color:#fff;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.08);background:linear-gradient(135deg,#555,#777);transition:transform .08s}
+.bottom button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.08)}
+.score{display:flex;justify-content:center;gap:14px;font-size:.95rem;color:#666}
