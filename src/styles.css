@@ -50,6 +50,8 @@ header h1{font-size:1.7rem;color:var(--accent);flex:1}
 .tool-btn{border:none;border-radius:16px;padding:12px 18px;font-size:1.3rem;background:var(--card);box-shadow:0 4px 10px var(--shadow);cursor:pointer}
 .tool-btn:active{transform:scale(.94)}
 .tool-btn.sel{background:var(--accent);color:#fff}
+.tool-btn.edited{border:2px solid var(--win)}
+.edited-dot{position:absolute;top:2px;left:4px;width:8px;height:8px;border-radius:50%;background:var(--win)}
 .palette{display:flex;justify-content:center;gap:10px}
 .palette-btn{width:34px;height:34px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.2);cursor:pointer}
 .palette-btn.active{border-color:var(--text);transform:scale(1.15)}
