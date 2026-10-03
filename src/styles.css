@@ -43,7 +43,7 @@ header h1{font-size:1.7rem;color:var(--accent);flex:1}
 .hero-emoji.h2{animation-delay:1.2s}
 @keyframes heroFloat{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}
 .floating-deco{position:fixed;font-size:1.8rem;opacity:.5;pointer-events:none;z-index:0;animation:floaty 6s ease-in-out infinite;top:18%;left:4%}
-.mascot{position:fixed;bottom:2%;right:-2%;width:120px;pointer-events:none;z-index:0;mix-blend-mode:multiply;animation:mascotBounce 2.4s ease-in-out infinite;transform-origin:bottom center}
+.mascot{position:fixed;bottom:2%;right:-2%;width:120px;pointer-events:none;z-index:30;mix-blend-mode:multiply;animation:mascotBounce 2.4s ease-in-out infinite;transform-origin:bottom center}
 @keyframes mascotBounce{0%,100%{transform:rotate(-3deg) scaleY(1)}50%{transform:rotate(2deg) scaleY(1.03)}}
 .game-card .card-banner{position:relative;z-index:1}
 .floating-deco.f2{top:8%;right:6%;animation-delay:1.5s;font-size:1.5rem}
