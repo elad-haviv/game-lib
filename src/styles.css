@@ -20,11 +20,33 @@ header h1{font-size:1.7rem;color:var(--accent);flex:1}
 .screen{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px;animation:fadeIn .3s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .library-header{text-align:center;font-size:1.05rem;color:#777}
-.game-card{display:flex;align-items:center;gap:16px;background:var(--card);border-radius:22px;padding:18px 16px;box-shadow:0 8px 20px var(--shadow);text-decoration:none;color:inherit;cursor:pointer;border:none;font-family:inherit;font-size:1.1rem;text-align:right}
-.game-card:active{transform:scale(.98)}
-.game-card .emoji{font-size:2.4rem}
-.game-card .info h2{font-size:1.15rem;color:var(--accent);margin-bottom:2px}
-.game-card .info p{font-size:.85rem;color:#888}
+.game-card{display:flex;flex-direction:column;background:var(--card);border-radius:26px;padding:0;box-shadow:0 10px 24px var(--shadow);text-decoration:none;color:inherit;cursor:pointer;border:none;font-family:inherit;text-align:right;overflow:hidden;animation:cardPop .5s cubic-bezier(.34,1.4,.64,1) backwards}
+.game-card:nth-child(2){animation-delay:.15s}
+@keyframes cardPop{from{transform:scale(.8) rotate(-2deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.game-card:active{transform:scale(.97)}
+.game-card.g0 .card-banner{background:linear-gradient(135deg,#ff9a9e,#fad0c4)}
+.game-card.g1 .card-banner{background:linear-gradient(135deg,#a1c4fd,#c2e9fb)}
+.game-card.g2 .card-banner{background:linear-gradient(135deg,#d4fc79,#96e6a1)}
+.card-banner{padding:10px 14px 0}
+.card-art{width:100%;height:auto;display:block;filter:drop-shadow(0 4px 8px rgba(0,0,0,.08))}
+.art-wiggle{animation:wiggle 2.2s ease-in-out infinite}
+.art-wiggle2{animation:wiggle 2.8s ease-in-out infinite reverse}
+@keyframes wiggle{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-2px) rotate(2deg)}}
+.game-card .info{padding:12px 16px 16px}
+.game-card .info h2{font-size:1.25rem;color:var(--accent);margin-bottom:2px}
+.game-card .info p{font-size:.85rem;color:#888;margin-bottom:8px}
+.play-badge{display:inline-block;background:linear-gradient(135deg,#8e44ad,#9b59b6);color:#fff;font-size:.9rem;font-weight:900;padding:6px 16px;border-radius:50px;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.library-hero{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 0 2px}
+.library-title{font-size:2rem;color:var(--accent);text-shadow:0 3px 0 rgba(142,68,173,.15);animation:bounceTitle 2s ease-in-out infinite}
+@keyframes bounceTitle{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.hero-emoji{font-size:1.8rem;animation:heroFloat 2.4s ease-in-out infinite}
+.hero-emoji.h2{animation-delay:1.2s}
+@keyframes heroFloat{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}
+.floating-deco{position:fixed;font-size:1.8rem;opacity:.5;pointer-events:none;z-index:0;animation:floaty 6s ease-in-out infinite;top:18%;left:4%}
+.floating-deco.f2{top:8%;right:6%;animation-delay:1.5s;font-size:1.5rem}
+.floating-deco.f3{bottom:22%;left:6%;animation-delay:3s;font-size:1.6rem}
+.floating-deco.f4{bottom:10%;right:8%;animation-delay:4.5s}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-14px) rotate(6deg)}}
 .mode-card{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .mode-card button{border:none;border-radius:20px;padding:18px 6px;font-family:inherit;font-size:1.05rem;color:#fff;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,0.1);transition:transform .08s,box-shadow .08s}
 .mode-card button:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,0.1)}

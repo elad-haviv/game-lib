@@ -4,14 +4,24 @@ import { games } from './games'
 function Library() {
   return (
     <>
+      <div className="floating-deco" aria-hidden>🎈</div>
+      <div className="floating-deco f2" aria-hidden>⭐</div>
+      <div className="floating-deco f3" aria-hidden>🌈</div>
+      <div className="floating-deco f4" aria-hidden>🎈</div>
       <div className="screen">
-        <div className="library-header">בחרו משחק</div>
-        {games.map((g) => (
-          <Link key={g.id} to={g.path} className="game-card">
-            <div className="emoji">{g.emoji}</div>
+        <div className="library-hero">
+          <span className="hero-emoji h1">🎉</span>
+          <h1 className="library-title">ספריית משחקים</h1>
+          <span className="hero-emoji h2">🎈</span>
+        </div>
+        <div className="library-header">בחרו משחק!</div>
+        {games.map((g, i) => (
+          <Link key={g.id} to={g.path} className={`game-card g${i % 3}`} style={{ animationDelay: `${i * 0.15}s` }}>
+            <div className="card-banner">{g.art}</div>
             <div className="info">
-              <h2>{g.title}</h2>
+              <h2>{g.emoji} {g.title}</h2>
               <p>{g.subtitle}</p>
+              <span className="play-badge">שחקו ▶</span>
             </div>
           </Link>
         ))}
