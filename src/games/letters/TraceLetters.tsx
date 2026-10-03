@@ -3,36 +3,37 @@ import { LETTERS, BRUSH_COLORS } from './data'
 
 type Pt = [number, number]
 
-const TOL = 14          // סטייה מותרת מהמסלול (יחידות SVG)
-const START_TOL = 17    // רדיוס התחלה מהנקודה הירוקה
+const TOL = 15          // סטייה מותרת מהמסלול (יחידות SVG)
+const START_TOL = 18    // רדיוס התחלה מהנקודה הירוקה
 const RESUME_TOL = 18   // המשך מקו קיים אחרי הרמת אצבע
 
 function dist(a: Pt, b: Pt) {
   return Math.hypot(a[0] - b[0], a[1] - b[1])
 }
 
-// דגימת מסלול לנקודות צפופות
-function samplePath(points: Pt[], step = 1.5): Pt[] {
-  const out: Pt[] = [points[0]]
-  for (let i = 1; i < points.length; i++) {
-    const [x0, y0] = points[i - 1]
-    const [x1, y1] = points[i]
-    const d = Math.hypot(x1 - x0, y1 - y0)
-    const n = Math.max(1, Math.ceil(d / step))
-    for (let j = 1; j <= n; j++) out.push([x0 + ((x1 - x0) * j) / n, y0 + ((y1 - y0) * j) / n])
+// דגימת נתיב SVG לנקודות צפופות בעזרת getPointAtLength
+function samplePath(d: string, step = 1.5): Pt[] {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+  el.setAttribute('d', d)
+  const len = el.getTotalLength()
+  const n = Math.max(2, Math.ceil(len / step))
+  const out: Pt[] = []
+  for (let i = 0; i <= n; i++) {
+    const p = el.getPointAtLength((len * i) / n)
+    out.push([p.x, p.y])
   }
   return out
 }
 
-// המרת מיקום מסך (clientX/Y) לקואורדינטות ה-viewBox (0-100, כולל שוליים של 10)
+// המרת מיקום מסך (clientX/Y) לקואורדינטות ה-viewBox (0-100, כולל שוליים)
 function toSvg(e: React.PointerEvent, el: SVGSVGElement): Pt {
   const r = el.getBoundingClientRect()
-  const k = Math.min(r.width, r.height) / 120 // קנה מידה של ה-viewBox המרובע
-  const ox = (r.width - 120 * k) / 2
-  const oy = (r.height - 120 * k) / 2
+  const k = Math.min(r.width, r.height) / 114 // קנה מידה של ה-viewBox המרובע
+  const ox = (r.width - 114 * k) / 2
+  const oy = (r.height - 114 * k) / 2
   return [
-    (e.clientX - r.left - ox) / k - 10,
-    (e.clientY - r.top - oy) / k - 10,
+    (e.clientX - r.left - ox) / k - 7,
+    (e.clientY - r.top - oy) / k - 7,
   ]
 }
 
@@ -49,8 +50,10 @@ export default function TraceLetters() {
   const progressRef = useRef(0)
 
   const letter = LETTERS[letterIdx]
-  const stroke = letter.strokes[strokeIdx]
-  const dense = useMemo(() => samplePath(stroke), [letterIdx, strokeIdx])
+  const strokeD = letter.strokes[strokeIdx]
+  const dense = useMemo(() => samplePath(strokeD), [letterIdx, strokeIdx])
+  const startPt = dense[0]
+  const endPt = dense[dense.length - 1]
 
   function resetStroke() {
     setTrace([])
@@ -103,10 +106,10 @@ export default function TraceLetters() {
       return
     }
     // התחלה חדשה — ליד העיגול הירוק
-    if (trace.length === 0 && dist(p, stroke[0]) <= START_TOL) {
+    if (trace.length === 0 && dist(p, startPt) <= START_TOL) {
       try { el.setPointerCapture(e.pointerId) } catch { /* synthetic pointer */ }
       tracing.current = true
-      setTrace([stroke[0]])
+      setTrace([startPt])
       progressRef.current = 0
       setProgress(0)
     }
@@ -129,7 +132,7 @@ export default function TraceLetters() {
     setTrace((t) => [...t, p])
     progressRef.current = Math.max(progressRef.current, bestIdx / (dense.length - 1))
     setProgress(progressRef.current)
-    if (bestIdx >= dense.length - 3 && dist(p, stroke[stroke.length - 1]) <= TOL) completeStroke()
+    if (bestIdx >= dense.length - 3 && dist(p, endPt) <= TOL) completeStroke()
   }
 
   function onUp() {
@@ -153,19 +156,16 @@ export default function TraceLetters() {
       <div className={`trace-wrap ${shake ? 'shake' : ''}`}>
         <svg ref={svgRef} viewBox="-7 -7 114 114" className="trace-svg"
           onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
-          {letter.strokes.map((s, i) => (
-            <polyline key={i} points={s.map((p) => p.join(',')).join(' ')}
-              fill="none" stroke="#ddd0f0" strokeWidth="17" strokeLinecap="round" strokeLinejoin="round" />
+          {letter.strokes.map((d, i) => (
+            <path key={i} d={d} fill="none" stroke="#ddd0f0" strokeWidth="17" strokeLinecap="round" strokeLinejoin="round" />
           ))}
-          {letter.strokes.slice(0, strokeIdx).map((s, i) => (
-            <polyline key={`done-${i}`} points={s.map((p) => p.join(',')).join(' ')}
-              fill="none" stroke={color} strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
+          {letter.strokes.slice(0, strokeIdx).map((d, i) => (
+            <path key={`done-${i}`} d={d} fill="none" stroke={color} strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
           ))}
-          <polyline points={letter.strokes[strokeIdx].map((p) => p.join(',')).join(' ')}
-            fill="none" stroke="#8e44ad" strokeWidth="7" strokeLinecap="round" strokeDasharray="6 8" opacity="0.9" />
-          <polyline points={trace.map((p) => p.join(',')).join(' ')} fill="none" stroke={color} strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx={stroke[0][0]} cy={stroke[0][1]} r="7" fill="#2ecc40" />
-          <circle cx={stroke[stroke.length - 1][0]} cy={stroke[stroke.length - 1][1]} r="7" fill="#ff3b30" />
+          <path d={strokeD} fill="none" stroke="#8e44ad" strokeWidth="7" strokeLinecap="round" strokeDasharray="6 8" opacity="0.9" />
+          <polyline points={trace.map((p) => p.join(',')).join(' ')} fill="none" stroke={color} strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx={startPt[0]} cy={startPt[1]} r="8" fill="#2ecc40" />
+          <circle cx={endPt[0]} cy={endPt[1]} r="8" fill="#ff3b30" />
         </svg>
         <div className="trace-progress"><div style={{ width: `${progress * 100}%` }} /></div>
       </div>
