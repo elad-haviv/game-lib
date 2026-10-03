@@ -1,4 +1,5 @@
 import TicTacToe from './games/tictactoe/TicTacToe'
+import TraceLetters from './games/letters/TraceLetters'
 
 export interface GameMeta {
   id: string
@@ -17,6 +18,14 @@ export const games: GameMeta[] = [
     emoji: '❌⭕',
     path: '/game/tictactoe',
     element: <TicTacToe />,
+  },
+  {
+    id: 'trace-letters',
+    title: 'כתיבת אותיות',
+    subtitle: 'עקבו אחרי האותיות באצבע',
+    emoji: '✍️',
+    path: '/game/trace-letters',
+    element: <TraceLetters />,
   },
   // משחקים חדשים מתווספים כאן
 ]
