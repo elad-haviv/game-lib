@@ -3,15 +3,16 @@ import { LETTERS, BRUSH_COLORS } from './data'
 
 type Pt = [number, number]
 
-const TOL = 13          // סטייה מותרת מהמסלול (יחידות SVG)
-const START_TOL = 16    // רדיוס התחלה מהנקודה הירוקה
+const TOL = 14          // סטייה מותרת מהמסלול (יחידות SVG)
+const START_TOL = 17    // רדיוס התחלה מהנקודה הירוקה
+const RESUME_TOL = 18   // המשך מקו קיים אחרי הרמת אצבע
 
 function dist(a: Pt, b: Pt) {
   return Math.hypot(a[0] - b[0], a[1] - b[1])
 }
 
 // דגימת מסלול לנקודות צפופות
-function samplePath(points: Pt[], step = 1.2): Pt[] {
+function samplePath(points: Pt[], step = 1.5): Pt[] {
   const out: Pt[] = [points[0]]
   for (let i = 1; i < points.length; i++) {
     const [x0, y0] = points[i - 1]
@@ -23,12 +24,15 @@ function samplePath(points: Pt[], step = 1.2): Pt[] {
   return out
 }
 
+// המרת מיקום מסך (clientX/Y) לקואורדינטות ה-viewBox (0-100, כולל שוליים של 10)
 function toSvg(e: React.PointerEvent, el: SVGSVGElement): Pt {
   const r = el.getBoundingClientRect()
-  const s = 100 / Math.min(r.width, r.height)
+  const k = Math.min(r.width, r.height) / 120 // קנה מידה של ה-viewBox המרובע
+  const ox = (r.width - 120 * k) / 2
+  const oy = (r.height - 120 * k) / 2
   return [
-    ((e.clientX - r.left) - (r.width - r.height) / 2) * s,
-    (e.clientY - r.top) * s,
+    (e.clientX - r.left - ox) / k - 10,
+    (e.clientY - r.top - oy) / k - 10,
   ]
 }
 
@@ -37,11 +41,12 @@ export default function TraceLetters() {
   const [strokeIdx, setStrokeIdx] = useState(0)
   const [color, setColor] = useState(BRUSH_COLORS[3])
   const [trace, setTrace] = useState<Pt[]>([])
-  const [progress, setProgress] = useState(0) // 0..1 התקדמות באות הנוכחית
+  const [progress, setProgress] = useState(0) // 0..1 התקדמות בקו הנוכחי
   const [shake, setShake] = useState(false)
   const [celebrate, setCelebrate] = useState(false)
   const svgRef = useRef<SVGSVGElement>(null)
   const tracing = useRef(false)
+  const progressRef = useRef(0)
 
   const letter = LETTERS[letterIdx]
   const stroke = letter.strokes[strokeIdx]
@@ -49,16 +54,18 @@ export default function TraceLetters() {
 
   function resetStroke() {
     setTrace([])
+    progressRef.current = 0
     setProgress(0)
     tracing.current = false
     setShake(true)
     setTimeout(() => setShake(false), 350)
   }
 
-  function nextLetter() {
-    setLetterIdx((i) => (i + 1) % LETTERS.length)
+  function gotoLetter(idx: number) {
+    setLetterIdx(((idx % LETTERS.length) + LETTERS.length) % LETTERS.length)
     setStrokeIdx(0)
     setTrace([])
+    progressRef.current = 0
     setProgress(0)
     setCelebrate(false)
   }
@@ -75,6 +82,7 @@ export default function TraceLetters() {
   function completeStroke() {
     tracing.current = false
     setTrace([])
+    progressRef.current = 0
     setProgress(0)
     if (strokeIdx + 1 < letter.strokes.length) {
       setStrokeIdx((s) => s + 1)
@@ -89,10 +97,17 @@ export default function TraceLetters() {
     const el = svgRef.current
     if (!el) return
     const p = toSvg(e, el)
-    if (dist(p, stroke[0]) <= START_TOL) {
+    // המשך מקו קיים אחרי הרמת אצבע — ליד הנקודה האחרונה שצוירה
+    if (trace.length > 1 && dist(p, trace[trace.length - 1]) <= RESUME_TOL) {
+      tracing.current = true
+      return
+    }
+    // התחלה חדשה — ליד העיגול הירוק
+    if (trace.length === 0 && dist(p, stroke[0]) <= START_TOL) {
       try { el.setPointerCapture(e.pointerId) } catch { /* synthetic pointer */ }
       tracing.current = true
       setTrace([stroke[0]])
+      progressRef.current = 0
       setProgress(0)
     }
   }
@@ -105,28 +120,30 @@ export default function TraceLetters() {
     // מרחק מהמסלול — רק מנקודת ההתקדמות והלאה
     let best = Infinity
     let bestIdx = 0
-    for (let i = Math.max(0, Math.floor(progress * dense.length) - 8); i < dense.length; i++) {
+    const from = Math.max(0, Math.floor(progressRef.current * dense.length) - 10)
+    for (let i = from; i < dense.length; i++) {
       const d = dist(p, dense[i])
       if (d < best) { best = d; bestIdx = i }
     }
     if (best > TOL) { resetStroke(); return }
     setTrace((t) => [...t, p])
-    setProgress(Math.max(progress, bestIdx / (dense.length - 1)))
-    if (bestIdx >= dense.length - 2 && dist(p, stroke[stroke.length - 1]) <= TOL) completeStroke()
+    progressRef.current = Math.max(progressRef.current, bestIdx / (dense.length - 1))
+    setProgress(progressRef.current)
+    if (bestIdx >= dense.length - 3 && dist(p, stroke[stroke.length - 1]) <= TOL) completeStroke()
   }
 
   function onUp() {
-    if (tracing.current && trace.length > 0) resetStroke() // עזיבת המסלול באמצע = מתחילים מחדש
+    tracing.current = false // אפשר להרים את האצבע ולהמשיך מאיפה שהפסיקו
   }
 
-  const showStart = strokeIdx < letter.strokes.length
+  const strokeNum = strokeIdx + 1
 
   return (
     <>
       <div className="letter-toolbar">
-        <button className="tool-btn" onClick={() => { setLetterIdx((letterIdx + LETTERS.length - 1) % LETTERS.length); setStrokeIdx(0); setTrace([]); setProgress(0); setCelebrate(false) }}>➡️</button>
+        <button className="tool-btn" onClick={() => gotoLetter(letterIdx - 1)}>➡️</button>
         <button className="tool-btn" onClick={speak}>🔊</button>
-        <button className="tool-btn" onClick={() => { setLetterIdx((letterIdx + 1) % LETTERS.length); setStrokeIdx(0); setTrace([]); setProgress(0); setCelebrate(false) }}>⬅️</button>
+        <button className="tool-btn" onClick={() => gotoLetter(letterIdx + 1)}>⬅️</button>
       </div>
       <div className="palette">
         {BRUSH_COLORS.map((c) => (
@@ -142,24 +159,26 @@ export default function TraceLetters() {
               fill="none" stroke={i === strokeIdx ? '#b9a8d8' : 'transparent'}
               strokeWidth="7" strokeLinecap="round" strokeDasharray="5 7" opacity={i === strokeIdx ? 0.9 : 0} />
           ))}
+          {letter.strokes.slice(0, strokeIdx).map((s, i) => (
+            <polyline key={`done-${i}`} points={s.map((p) => p.join(',')).join(' ')}
+              fill="none" stroke={color} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" opacity="0.55" />
+          ))}
           <polyline points={trace.map((p) => p.join(',')).join(' ')} fill="none" stroke={color} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
-          {showStart && (
-            <>
-              <circle cx={stroke[0][0]} cy={stroke[0][1]} r="7" fill="#2ecc40" />
-              <circle cx={stroke[stroke.length - 1][0]} cy={stroke[stroke.length - 1][1]} r="7" fill="#ff3b30" />
-            </>
-          )}
+          <circle cx={stroke[0][0]} cy={stroke[0][1]} r="7" fill="#2ecc40" />
+          <circle cx={stroke[stroke.length - 1][0]} cy={stroke[stroke.length - 1][1]} r="7" fill="#ff3b30" />
         </svg>
         <div className="trace-progress"><div style={{ width: `${progress * 100}%` }} /></div>
       </div>
-      <div className="trace-hint">התחילו מהעיגול הירוק 🟢 וגמרו באדום 🔴</div>
+      <div className="trace-hint">
+        קו {strokeNum} מתוך {letter.strokes.length} — התחילו מהעיגול הירוק 🟢 וגמרו באדום 🔴
+      </div>
       {celebrate && (
         <div className="modal-overlay">
           <div className="modal-card">
             <div className="modal-emoji">🌟🎉</div>
             <div className="modal-title">כל הכבוד!</div>
             <div className="modal-score">כתבת את האות {letter.char} ({letter.name})</div>
-            <button className="modal-play" onClick={nextLetter}>➡️ האות הבאה</button>
+            <button className="modal-play" onClick={() => gotoLetter(letterIdx + 1)}>➡️ האות הבאה</button>
           </div>
         </div>
       )}
