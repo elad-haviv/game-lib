@@ -1,6 +1,6 @@
 import TicTacToe from './games/tictactoe/TicTacToe'
 import TraceLetters from './games/letters/TraceLetters'
-import StrokeEditor from './games/letters/StrokeEditor'
+// עורך האותיות מוסתר — לשחזור: import StrokeEditor from './games/letters/StrokeEditor'
 
 export interface GameMeta {
   id: string
@@ -28,13 +28,14 @@ export const games: GameMeta[] = [
     path: '/game/trace-letters',
     element: <TraceLetters />,
   },
-  {
-    id: 'stroke-editor',
-    title: 'עורך אותיות (לאבא)',
-    subtitle: 'ציירו קווי אות וייצאו',
-    emoji: '🛠️',
-    path: '/game/stroke-editor',
-    element: <StrokeEditor />,
-  },
+  // עורך האותיות (StrokeEditor) מוסתר מהילדים — הנתיב זמין רק דרך הישומון; לשחזור הוסיפו רישום חזרה ל-games.tsx
+  // {
+  //   id: 'stroke-editor',
+  //   title: 'עורך אותיות (לאבא)',
+  //   subtitle: 'ציירו קווי אות וייצאו',
+  //   emoji: '🛠️',
+  //   path: '/game/stroke-editor',
+  //   element: <StrokeEditor />,
+  // },
   // משחקים חדשים מתווספים כאן
 ]
