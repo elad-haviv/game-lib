@@ -153,17 +153,17 @@ export default function TraceLetters() {
       <div className={`trace-wrap ${shake ? 'shake' : ''}`}>
         <svg ref={svgRef} viewBox="-10 -10 120 120" className="trace-svg"
           onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
-          <text x="50" y="86" textAnchor="middle" fontSize="110" fill="#ececf3" style={{ fontWeight: 900 }}>{letter.char}</text>
           {letter.strokes.map((s, i) => (
             <polyline key={i} points={s.map((p) => p.join(',')).join(' ')}
-              fill="none" stroke={i === strokeIdx ? '#b9a8d8' : 'transparent'}
-              strokeWidth="7" strokeLinecap="round" strokeDasharray="5 7" opacity={i === strokeIdx ? 0.9 : 0} />
+              fill="none" stroke="#ddd0f0" strokeWidth="15" strokeLinecap="round" strokeLinejoin="round" />
           ))}
           {letter.strokes.slice(0, strokeIdx).map((s, i) => (
             <polyline key={`done-${i}`} points={s.map((p) => p.join(',')).join(' ')}
-              fill="none" stroke={color} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" opacity="0.55" />
+              fill="none" stroke={color} strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
           ))}
-          <polyline points={trace.map((p) => p.join(',')).join(' ')} fill="none" stroke={color} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
+          <polyline points={letter.strokes[strokeIdx].map((p) => p.join(',')).join(' ')}
+            fill="none" stroke="#8e44ad" strokeWidth="7" strokeLinecap="round" strokeDasharray="6 8" opacity="0.9" />
+          <polyline points={trace.map((p) => p.join(',')).join(' ')} fill="none" stroke={color} strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
           <circle cx={stroke[0][0]} cy={stroke[0][1]} r="7" fill="#2ecc40" />
           <circle cx={stroke[stroke.length - 1][0]} cy={stroke[stroke.length - 1][1]} r="7" fill="#ff3b30" />
         </svg>
