@@ -90,7 +90,7 @@ export default function TraceLetters() {
     if (!el) return
     const p = toSvg(e, el)
     if (dist(p, stroke[0]) <= START_TOL) {
-      el.setPointerCapture(e.pointerId)
+      try { el.setPointerCapture(e.pointerId) } catch { /* synthetic pointer */ }
       tracing.current = true
       setTrace([stroke[0]])
       setProgress(0)
