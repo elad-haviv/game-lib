@@ -103,6 +103,18 @@ export default function TicTacToe() {
         <button onClick={() => setMode(null)}>🔄 בחירת מצב</button>
         <button onClick={() => newRound()}>▶ משחק חדש</button>
       </div>
+      {(winner || draw) && (
+        <div className="modal-overlay" onClick={() => newRound()}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-emoji">{winner ? (winner.player === 'X' ? '🎉' : '🤖') : '🤝'}</div>
+            <div className="modal-title">
+              {winner ? `${winner.player} ניצח!` : 'תיקו!'}
+            </div>
+            <div className="modal-score">❌ {score.x} · ⭕ {score.o}</div>
+            <button className="modal-play" onClick={() => newRound()}>▶ שחק שוב</button>
+          </div>
+        </div>
+      )}
     </>
   )
 }

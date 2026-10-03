@@ -37,8 +37,8 @@ function GamePage({ title, children }: { title: string; children: React.ReactNod
   return (
     <>
       <header>
-        <Link to="/" className="back-btn">← ספרייה</Link>
         <h1>{title}</h1>
+        <Link to="/" className="home-btn">🏠</Link>
       </header>
       <div className="screen">{children}</div>
     </>
