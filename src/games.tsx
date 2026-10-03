@@ -1,5 +1,6 @@
 import TicTacToe from './games/tictactoe/TicTacToe'
 import TraceLetters from './games/letters/TraceLetters'
+import StrokeEditor from './games/letters/StrokeEditor'
 
 export interface GameMeta {
   id: string
@@ -26,6 +27,14 @@ export const games: GameMeta[] = [
     emoji: '✍️',
     path: '/game/trace-letters',
     element: <TraceLetters />,
+  },
+  {
+    id: 'stroke-editor',
+    title: 'עורך אותיות (לאבא)',
+    subtitle: 'ציירו קווי אות וייצאו',
+    emoji: '🛠️',
+    path: '/game/stroke-editor',
+    element: <StrokeEditor />,
   },
   // משחקים חדשים מתווספים כאן
 ]
