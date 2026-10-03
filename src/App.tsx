@@ -8,6 +8,7 @@ function Library() {
       <div className="floating-deco f2" aria-hidden>⭐</div>
       <div className="floating-deco f3" aria-hidden>🌈</div>
       <div className="floating-deco f4" aria-hidden>🎈</div>
+      <img src="/mascot.png" alt="" className="mascot" aria-hidden />
       <div className="screen">
         <div className="library-hero">
           <span className="hero-emoji h1">🎉</span>

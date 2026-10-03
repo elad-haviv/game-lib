@@ -175,6 +175,7 @@ export default function TraceLetters() {
       {celebrate && (
         <div className="modal-overlay">
           <div className="modal-card">
+            <img src="/mascot.png" alt="" style={{ width: 90, mixBlendMode: 'multiply' }} />
             <div className="modal-emoji">🌟🎉</div>
             <div className="modal-title">כל הכבוד!</div>
             <div className="modal-score">כתבת את האות {letter.char} ({letter.name})</div>

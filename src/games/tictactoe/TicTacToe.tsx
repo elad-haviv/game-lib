@@ -106,6 +106,7 @@ export default function TicTacToe() {
       {(winner || draw) && (
         <div className="modal-overlay" onClick={() => newRound()}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <img src="/mascot.png" alt="" style={{ width: 90, mixBlendMode: 'multiply' }} />
             <div className="modal-emoji">{winner ? (winner.player === 'X' ? '🎉' : '🤖') : '🤝'}</div>
             <div className="modal-title">
               {winner ? `${winner.player} ניצח!` : 'תיקו!'}
