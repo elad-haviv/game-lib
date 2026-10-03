@@ -151,11 +151,11 @@ export default function TraceLetters() {
         ))}
       </div>
       <div className={`trace-wrap ${shake ? 'shake' : ''}`}>
-        <svg ref={svgRef} viewBox="-10 -10 120 120" className="trace-svg"
+        <svg ref={svgRef} viewBox="-7 -7 114 114" className="trace-svg"
           onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
           {letter.strokes.map((s, i) => (
             <polyline key={i} points={s.map((p) => p.join(',')).join(' ')}
-              fill="none" stroke="#ddd0f0" strokeWidth="15" strokeLinecap="round" strokeLinejoin="round" />
+              fill="none" stroke="#ddd0f0" strokeWidth="17" strokeLinecap="round" strokeLinejoin="round" />
           ))}
           {letter.strokes.slice(0, strokeIdx).map((s, i) => (
             <polyline key={`done-${i}`} points={s.map((p) => p.join(',')).join(' ')}
