@@ -1,1 +1,1 @@
-{"name":"Game Library","short_name":"Game Lib","start_url":".","display":"standalone","background_color":"#fff5f8","theme_color":"#ff6b9d","icons":[{"src":"icon.png","sizes":"192x192","type":"image/png"},{"src":"icon.png","sizes":"512x512","type":"image/png"}]}
+{"name":"ספריית משחקים","short_name":"משחקים","start_url":".","display":"standalone","background_color":"#f8f0ff","theme_color":"#8e44ad","icons":[{"src":"icon.png","sizes":"192x192","type":"image/png"},{"src":"icon.png","sizes":"512x512","type":"image/png"}],"dir":"rtl","lang":"he"}
