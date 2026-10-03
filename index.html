@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#ff6b9d">
+<title>Game Library — Tic Tac Toe</title>
+<link rel="manifest" href="manifest.json">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&family=Fredoka+One&display=swap');
+:root{--bg:#fff5f8;--card:#fff;--accent:#ff6b9d;--accent2:#6bc9ff;--win:#4ecdc4;--text:#2d2d3a;--shadow:rgba(255,107,157,0.15)}
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#fff5f8 0%,#e8f4ff 100%);color:var(--text);overflow:hidden}
+#app{max-width:480px;margin:0 auto;height:100vh;display:flex;flex-direction:column;padding:16px 16px 28px}
+header{text-align:center;padding:4px 0 10px}
+header h1{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--accent);letter-spacing:1px;text-shadow:0 3px 0 rgba(255,107,157,0.15)}
+.mode-card{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.mode-card button{border:none;border-radius:20px;padding:18px 6px;font-family:'Fredoka One',cursive;font-size:1.05rem;color:#fff;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,0.1);transition:transform .08s,box-shadow .08s;position:relative;overflow:hidden}
+.mode-card button:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,0.1)}
+.mode-card .vs-comp{background:linear-gradient(135deg,#ff6b9d,#ff8fab)}
+.mode-card .two-player{background:linear-gradient(135deg,#6bc9ff,#8ee3ff)}
+.status{font-family:'Fredoka One',cursive;text-align:center;font-size:1.15rem;padding:6px 14px;border-radius:50px;background:var(--card);box-shadow:0 4px 12px var(--shadow);margin-bottom:10px;min-height:44px;line-height:1.35;display:flex;align-items:center;justify-content:center;gap:8px}
+.status .dot{width:10px;height:10px;border-radius:50%;display:inline-block;animation:pulse 1s infinite alternate}
+.status .dot.x{background:var(--accent)}
+.status .dot.o{background:var(--accent2)}
+@keyframes pulse{from{opacity:.5}to{opacity:1}}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;flex:1;min-height:0}
+.board button{aspect-ratio:1;border:none;border-radius:20px;background:linear-gradient(145deg,#fff,#f6f6fa);box-shadow:0 6px 0 #ececf3,0 10px 20px rgba(0,0,0,.04);font-family:'Fredoka One',cursive;font-size:3.2rem;color:transparent;transition:all .2s;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.board button.filled{color:inherit;animation:pop .25s ease-out}
+.board button.filled.x{color:var(--accent);text-shadow:0 3px 0 rgba(255,107,157,.25)}
+.board button.filled.o{color:var(--accent2);text-shadow:0 3px 0 rgba(107,201,255,.25)}
+@keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.win-line{position:absolute;background:#4ecdc4;border-radius:4px;box-shadow:0 0 12px rgba(78,205,196,.6);z-index:2;pointer-events:none}
+.win-line.h{width:100%;height:8px;top:50%;left:0;transform:translateY(-50%)}
+.win-line.v{width:8px;height:100%;left:50%;top:0;transform:translateX(-50%)}
+.win-line.d1{width:140%;height:8px;top:50%;left:50%;transform:translate(-50%,-50%) rotate(45deg)}
+.win-line.d2{width:140%;height:8px;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-45deg)}
+.bottom{display:flex;gap:10px;margin-top:12px}
+.bottom button{flex:1;border:none;border-radius:14px;padding:14px;font-family:'Fredoka One',cursive;font-size:1rem;color:#fff;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.08);transition:transform .08s,box-shadow .08s;background:linear-gradient(135deg,#888,#aaa)}
+.bottom button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.08)}
+</style>
+</head>
+<body>
+<div id="app">
+<header><h1>🎮 Game Library</h1></header>
+<div class="mode-card">
+  <button class="vs-comp" onclick="startMode('comp')">🤖 vs Computer</button>
+  <button class="two-player" onclick="startMode('2p')">👥 2 Players</button>
+</div>
+<div class="status" id="status">Choose a mode to play!</div>
+<div class="board" id="board"></div>
+<div class="bottom">
+  <button onclick="resetGame()">🔄 Restart</button>
+  <button onclick="startMode('none')">🏠 Menu</button>
+</div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+let mode='none', board=['','','','','','','','',''], turn='X', gameOver=false, winner=null, lineEl=null;
+const winLines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+function startMode(m){ mode=m; board=Array(9).fill(''); turn='X'; gameOver=false; winner=null; $('#status').innerHTML='Player <span class="dot x"></span> X turn'; if(lineEl){lineEl.remove(); lineEl=null} buildBoard(); if(m==='comp' && turn==='O') setTimeout(compMove,500); }
+function buildBoard(){ $('#board').innerHTML=''; for(let i=0;i<9;i++){ let b=document.createElement('button'); b.onclick=()=>move(i); $('#board').appendChild(b); } }
+function move(i){ if(board[i]||gameOver||mode==='comp'&&turn==='O') return; board[i]=turn; updateUI(); if(checkWin()){ gameOver=true; $('#status').innerHTML='<span style="color:#4ecdc4;font-weight:900">'+turn+' WINS!</span>'; showLine(); }else if(board.every(c=>c)){ gameOver=true; $('#status').innerHTML='<span style="color:#888">Draw!</span>'; }else{ turn=turn==='X'?'O':'X'; $('#status').innerHTML='Player <span class="dot '+(turn==='X'?'x':'o')+'"></span> '+turn+' turn'; if(mode==='comp'&&turn==='O') setTimeout(compMove,400); } }
+function compMove(){ if(gameOver) return; let empty=board.map((v,i)=>v===''?i:null).filter(i=>i!==null); let r=empty[Math.floor(Math.random()*empty.length)]; if(r!==undefined) move(r); }
+function checkWin(){ for(let [a,b,c] of winLines){ if(board[a]&&board[a]===board[b]&&board[a]===board[c]){ winner=[a,b,c]; return true; } } return false; }
+function showLine(){ if(!winner) return; let [a,b,c]=winner; let dir=''; if(winner[0]%3===0&&winner[2]%3===2) dir='h'; else if(winner[0]<3&&winner[2]>6) dir='v'; else if(winner.join(',')==='0,4,8') dir='d1'; else dir='d2'; lineEl=document.createElement('div'); lineEl.className='win-line '+dir; $('#board').children[a].appendChild(lineEl); }
+function updateUI(){ Array.from($('#board').children).forEach((btn,i)=>{ btn.className=board[i]?'filled '+board[i].toLowerCase():''; btn.textContent=board[i]||''; }); }
+function resetGame(){ startMode(mode); }
+</script>
+</body>
+</html>
