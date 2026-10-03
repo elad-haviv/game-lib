@@ -154,7 +154,7 @@ export default function TraceLetters() {
       </div>
       <div className="trace-hint">התחילו מהעיגול הירוק 🟢 וגמרו באדום 🔴</div>
       {celebrate && (
-        <div className="modal-overlay" onClick={nextLetter}>
+        <div className="modal-overlay">
           <div className="modal-card">
             <div className="modal-emoji">🌟🎉</div>
             <div className="modal-title">כל הכבוד!</div>
